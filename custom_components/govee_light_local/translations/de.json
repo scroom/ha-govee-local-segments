@@ -16,24 +16,41 @@
         "state_attributes": {
           "effect": {
             "state": {
-              "breathe": "Breathe",
-              "candlelight": "Candlelight",
-              "crossing": "Crossing",
-              "dating": "Dating",
-              "energetic": "Energetic",
-              "movie": "Movie",
-              "none": "None",
-              "romantic": "Romantic",
-              "snowflake": "Snowflake",
-              "sunrise": "Sunrise",
-              "sunset": "Sunset",
-              "twinkle": "Twinkle"
+              "breathe": "Atmen",
+              "candlelight": "Kerzenlicht",
+              "crossing": "Kreuzung",
+              "dating": "Date",
+              "energetic": "Energiegeladen",
+              "movie": "Film",
+              "none": "Kein Effekt",
+              "romantic": "Romantisch",
+              "snowflake": "Schneeflocke",
+              "sunrise": "Sonnenaufgang",
+              "sunset": "Sonnenuntergang",
+              "twinkle": "Funkeln",
+              "music_energetic": "Musik: Energie",
+              "music_rhythm": "Musik: Rhythmus",
+              "music_bounce": "Musik: Bouncen",
+              "music_hopping": "Musik: Hüpfen",
+              "music_beat": "Musik: Schlag",
+              "music_spray": "Musik: Sprühen",
+              "music_skittles": "Musik: Skittles",
+              "music_torch": "Musik: Fackel",
+              "music_candy_crush": "Musik: Candy Crush",
+              "music_fusion": "Musik: Fusion",
+              "music_shiny": "Musik: Leuchtend",
+              "music_separation": "Musik: Trennung"
             }
           }
         }
       },
       "segment": {
         "name": "Segment {segment}"
+      }
+    },
+    "number": {
+      "music_sensitivity": {
+        "name": "Musik-Empfindlichkeit"
       }
     }
   },

@@ -241,3 +241,96 @@ async def test_restore_segment_state(hass: HomeAssistant, mock_govee_api) -> Non
     state = hass.states.get(SEG.format(2))
     assert state.attributes[ATTR_RGB_COLOR] == (10, 20, 30)
     assert state.attributes[ATTR_BRIGHTNESS] == 100
+
+
+async def test_music_effects(hass: HomeAssistant, mock_govee_api) -> None:
+    """H6076 offers the 12 app music effects with the captured commands."""
+    await setup_light(hass, mock_govee_api)
+    effects = hass.states.get(MAIN).attributes["effect_list"]
+    music = [e for e in effects if e.startswith("music_")]
+    assert len(music) == 12
+    assert "candlelight" in effects
+
+    await hass.services.async_call(
+        LIGHT_DOMAIN,
+        "turn_on",
+        {ATTR_ENTITY_ID: MAIN, "effect": "music_rhythm"},
+        blocking=True,
+    )
+    sent = [c.args[1] for c in mock_govee_api.send_raw_command.call_args_list]
+    # captured from the Govee app: 33 05 0f 04 63 01 … 5f
+    assert sent == ["33050f04630100000000000000000000000000" + "5f"]
+    assert hass.states.get(MAIN).attributes["effect"] == "music_rhythm"
+    mock_govee_api.set_scene.assert_not_awaited()
+
+    mock_govee_api.send_raw_command.reset_mock()
+    await hass.services.async_call(
+        LIGHT_DOMAIN,
+        "turn_on",
+        {ATTR_ENTITY_ID: MAIN, "effect": "music_torch"},
+        blocking=True,
+    )
+    sent = [c.args[1] for c in mock_govee_api.send_raw_command.call_args_list]
+    assert sent == [
+        "a3000102415007ff0000ff7f00ffff0000ff0036",
+        "a3ff0000ff00ffff8b00ff0000000000000000d7",
+        "33050f50630000000000000000000000000000" + "0a",
+    ]
+
+    await hass.services.async_call(
+        LIGHT_DOMAIN,
+        "turn_on",
+        {ATTR_ENTITY_ID: MAIN, "effect": "none"},
+        blocking=True,
+    )
+    assert hass.states.get(MAIN).attributes["effect"] is None
+
+
+async def test_music_sensitivity(hass: HomeAssistant, mock_govee_api) -> None:
+    """The sensitivity number re-sends the active music effect."""
+    await setup_light(hass, mock_govee_api)
+    number = "number.h6076_music_sensitivity"
+    assert hass.states.get(number).state == "100.0"
+
+    await hass.services.async_call(
+        LIGHT_DOMAIN,
+        "turn_on",
+        {ATTR_ENTITY_ID: MAIN, "effect": "music_rhythm"},
+        blocking=True,
+    )
+    mock_govee_api.send_raw_command.reset_mock()
+    await hass.services.async_call(
+        "number",
+        "set_value",
+        {ATTR_ENTITY_ID: number, "value": 0},
+        blocking=True,
+    )
+    await hass.async_block_till_done()
+    sent = [c.args[1] for c in mock_govee_api.send_raw_command.call_args_list]
+    # captured: slider far left = 33 05 0f 04 00 01 … 3c
+    assert sent == ["33050f04000100000000000000000000000000" + "3c"]
+
+    # without an active music effect nothing is sent
+    await hass.services.async_call(
+        LIGHT_DOMAIN,
+        "turn_on",
+        {ATTR_ENTITY_ID: MAIN, "effect": "none"},
+        blocking=True,
+    )
+    mock_govee_api.send_raw_command.reset_mock()
+    await hass.services.async_call(
+        "number",
+        "set_value",
+        {ATTR_ENTITY_ID: number, "value": 50},
+        blocking=True,
+    )
+    await hass.async_block_till_done()
+    mock_govee_api.send_raw_command.assert_not_awaited()
+
+
+async def test_no_music_for_other_models(hass: HomeAssistant, mock_govee_api) -> None:
+    """Models without verified music commands get no music effects or number."""
+    await setup_light(hass, mock_govee_api, BASIC_CAPABILITIES, sku="H6008")
+    effects = hass.states.get("light.h6008").attributes["effect_list"]
+    assert not any(e.startswith("music_") for e in effects)
+    assert hass.states.get("number.h6008_music_sensitivity") is None

@@ -42,6 +42,9 @@ class GoveeLocalApiCoordinator(DataUpdateCoordinator[list[GoveeDevice]]):
             update_interval=SCAN_INTERVAL,
         )
 
+        # Music sensitivity per device fingerprint (0-99), set by number entities
+        self.music_sensitivity: dict[str, int] = {}
+
         self._controllers: list[GoveeController] = [
             GoveeController(
                 loop=hass.loop,

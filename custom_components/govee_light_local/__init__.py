@@ -16,7 +16,7 @@ from homeassistant.exceptions import ConfigEntryNotReady
 from .const import DISCOVERY_TIMEOUT, DOMAIN
 from .coordinator import GoveeLocalApiCoordinator, GoveeLocalConfigEntry
 
-PLATFORMS: list[Platform] = [Platform.LIGHT]
+PLATFORMS: list[Platform] = [Platform.LIGHT, Platform.NUMBER]
 
 _LOGGER = logging.getLogger(__name__)
 

@@ -27,13 +27,30 @@
               "snowflake": "Snowflake",
               "sunrise": "Sunrise",
               "sunset": "Sunset",
-              "twinkle": "Twinkle"
+              "twinkle": "Twinkle",
+              "music_energetic": "Music: Energetic",
+              "music_rhythm": "Music: Rhythm",
+              "music_bounce": "Music: Bounce",
+              "music_hopping": "Music: Hopping",
+              "music_beat": "Music: Beat",
+              "music_spray": "Music: Spray",
+              "music_skittles": "Music: Skittles",
+              "music_torch": "Music: Torch",
+              "music_candy_crush": "Music: Candy Crush",
+              "music_fusion": "Music: Fusion",
+              "music_shiny": "Music: Shiny",
+              "music_separation": "Music: Separation"
             }
           }
         }
       },
       "segment": {
         "name": "Segment {segment}"
+      }
+    },
+    "number": {
+      "music_sensitivity": {
+        "name": "Music sensitivity"
       }
     }
   },

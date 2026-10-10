@@ -31,3 +31,7 @@ SIGNAL_SEGMENTS_CHANGED = f"{DOMAIN}_segments_changed_{{}}"
 SEGMENT_SEND_DELAY = 0.05
 # Dispatcher signal: the main light state changed (e.g. on/off).
 SIGNAL_DEVICE_UPDATED = f"{DOMAIN}_device_updated_{{}}"
+
+# Dispatcher signal: music sensitivity of a device changed.
+SIGNAL_MUSIC_SENSITIVITY = f"{DOMAIN}_music_sensitivity_{{}}"
+MUSIC_GROUP_DELAY = 0.15

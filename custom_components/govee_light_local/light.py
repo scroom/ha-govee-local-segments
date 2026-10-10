@@ -38,13 +38,16 @@ from .const import (
     DEVICE_TIMEOUT,
     DOMAIN,
     MANUFACTURER,
+    MUSIC_GROUP_DELAY,
     SEGMENT_SEND_DELAY,
     SERVICE_SET_GRADIENT,
     SIGNAL_DEVICE_UPDATED,
+    SIGNAL_MUSIC_SENSITIVITY,
     SIGNAL_SEGMENTS_CHANGED,
 )
 from .coordinator import GoveeLocalApiCoordinator, GoveeLocalConfigEntry
 from .gradient import RGB, interpolate, parse_colors, scale
+from .music import DEFAULT_SENSITIVITY, MUSIC_EFFECTS, music_packets, supports_music
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -158,6 +161,12 @@ class GoveeLight(CoordinatorEntity[GoveeLocalApiCoordinator], LightEntity):
             ):
                 self._attr_supported_features = LightEntityFeature.EFFECT
                 self._attr_effect_list = [_NONE_SCENE, *capabilities.scenes.keys()]
+            if supports_music(device.sku):
+                self._attr_supported_features = LightEntityFeature.EFFECT
+                self._attr_effect_list = [
+                    *(self._attr_effect_list or [_NONE_SCENE]),
+                    *MUSIC_EFFECTS,
+                ]
 
         self._attr_supported_color_modes = filter_supported_color_modes(color_modes)
         if len(self._attr_supported_color_modes) == 1:
@@ -251,7 +260,10 @@ class GoveeLight(CoordinatorEntity[GoveeLocalApiCoordinator], LightEntity):
                 else:
                     self._attr_effect = effect
                     self._save_last_color_state()
-                    await self.coordinator.set_scene(self._device, effect)
+                    if effect in MUSIC_EFFECTS:
+                        await self._send_music(effect)
+                    else:
+                        await self.coordinator.set_scene(self._device, effect)
                     self._notify_segments(None)
 
         if not self.is_on or not kwargs:
@@ -294,6 +306,22 @@ class GoveeLight(CoordinatorEntity[GoveeLocalApiCoordinator], LightEntity):
                 colors,
             )
 
+    async def _send_music(self, effect: str) -> None:
+        """Send a music effect (optional palette frames first)."""
+        sensitivity = self.coordinator.music_sensitivity.get(
+            self._device.fingerprint, DEFAULT_SENSITIVITY
+        )
+        for index, group in enumerate(music_packets(effect, sensitivity)):
+            if index:
+                await asyncio.sleep(MUSIC_GROUP_DELAY)
+            for frame in group:
+                await self._device.send_raw_command(frame)
+
+    async def _music_sensitivity_changed(self) -> None:
+        """Re-send the active music effect with the new sensitivity."""
+        if self._attr_effect in MUSIC_EFFECTS and self.is_on:
+            await self._send_music(self._attr_effect)
+
     async def async_set_gradient(
         self,
         colors: list[RGB],
@@ -329,6 +357,14 @@ class GoveeLight(CoordinatorEntity[GoveeLocalApiCoordinator], LightEntity):
         """Register update callback when entity is added."""
         await super().async_added_to_hass()
         self._device.set_update_callback(self._update_callback)
+        if supports_music(self._device.sku):
+            self.async_on_remove(
+                async_dispatcher_connect(
+                    self.hass,
+                    SIGNAL_MUSIC_SENSITIVITY.format(self._device.fingerprint),
+                    self._music_sensitivity_changed,
+                )
+            )
 
     @override
     async def async_will_remove_from_hass(self) -> None:
