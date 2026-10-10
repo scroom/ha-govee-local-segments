@@ -1,0 +1,68 @@
+{
+  "config": {
+    "step": {
+      "confirm": {
+        "description": "Möchtest du mit der Einrichtung beginnen?"
+      }
+    },
+    "abort": {
+      "no_devices_found": "Keine Geräte im Netzwerk gefunden",
+      "single_instance_allowed": "Bereits konfiguriert. Nur eine einzige Konfiguration möglich."
+    }
+  },
+  "entity": {
+    "light": {
+      "govee_light": {
+        "state_attributes": {
+          "effect": {
+            "state": {
+              "breathe": "Breathe",
+              "candlelight": "Candlelight",
+              "crossing": "Crossing",
+              "dating": "Dating",
+              "energetic": "Energetic",
+              "movie": "Movie",
+              "none": "None",
+              "romantic": "Romantic",
+              "snowflake": "Snowflake",
+              "sunrise": "Sunrise",
+              "sunset": "Sunset",
+              "twinkle": "Twinkle"
+            }
+          }
+        }
+      },
+      "segment": {
+        "name": "Segment {segment}"
+      }
+    }
+  },
+  "exceptions": {
+    "no_devices_found": {
+      "message": "Keine Geräte im Netzwerk gefunden"
+    },
+    "port_in_use": {
+      "message": "Port {port} wird bereits verwendet"
+    }
+  },
+  "services": {
+    "set_gradient": {
+      "name": "Farbverlauf setzen",
+      "description": "Verteilt einen Farbverlauf über alle Segmente der Lampe. Die erste Farbe gilt für Segment 1.",
+      "fields": {
+        "colors": {
+          "name": "Farben",
+          "description": "Zwei oder mehr Farben als Hex-Werte oder [r, g, b]."
+        },
+        "brightness_pct": {
+          "name": "Helligkeit",
+          "description": "Optionale Gesamthelligkeit der Lampe."
+        },
+        "reverse": {
+          "name": "Umkehren",
+          "description": "Verlauf am letzten Segment beginnen."
+        }
+      }
+    }
+  }
+}

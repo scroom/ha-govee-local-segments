@@ -1,0 +1,21 @@
+set_gradient:
+  target:
+    entity:
+      integration: govee_light_local
+      domain: light
+  fields:
+    colors:
+      required: true
+      example: '["#006a6a", "#0040ff"]'
+      selector:
+        object:
+    brightness_pct:
+      selector:
+        number:
+          min: 1
+          max: 100
+          unit_of_measurement: "%"
+    reverse:
+      default: false
+      selector:
+        boolean:

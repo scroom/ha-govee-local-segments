@@ -1,0 +1,68 @@
+{
+  "config": {
+    "step": {
+      "confirm": {
+        "description": "Do you want to start setup?"
+      }
+    },
+    "abort": {
+      "no_devices_found": "No devices found on the network",
+      "single_instance_allowed": "Already configured. Only a single configuration possible."
+    }
+  },
+  "entity": {
+    "light": {
+      "govee_light": {
+        "state_attributes": {
+          "effect": {
+            "state": {
+              "breathe": "Breathe",
+              "candlelight": "Candlelight",
+              "crossing": "Crossing",
+              "dating": "Dating",
+              "energetic": "Energetic",
+              "movie": "Movie",
+              "none": "None",
+              "romantic": "Romantic",
+              "snowflake": "Snowflake",
+              "sunrise": "Sunrise",
+              "sunset": "Sunset",
+              "twinkle": "Twinkle"
+            }
+          }
+        }
+      },
+      "segment": {
+        "name": "Segment {segment}"
+      }
+    }
+  },
+  "exceptions": {
+    "no_devices_found": {
+      "message": "No devices found on the network"
+    },
+    "port_in_use": {
+      "message": "Port {port} is already in use"
+    }
+  },
+  "services": {
+    "set_gradient": {
+      "name": "Set gradient",
+      "description": "Spreads a color gradient over all segments of the light. The first color is used for segment 1.",
+      "fields": {
+        "colors": {
+          "name": "Colors",
+          "description": "Two or more color stops as hex values or [r, g, b]."
+        },
+        "brightness_pct": {
+          "name": "Brightness",
+          "description": "Optional overall brightness of the light."
+        },
+        "reverse": {
+          "name": "Reverse",
+          "description": "Start the gradient at the last segment."
+        }
+      }
+    }
+  }
+}

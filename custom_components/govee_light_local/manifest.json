@@ -1,0 +1,18 @@
+{
+  "domain": "govee_light_local",
+  "name": "Govee lights local (segments)",
+  "codeowners": [
+    "@scroom"
+  ],
+  "config_flow": true,
+  "dependencies": [
+    "network"
+  ],
+  "documentation": "https://github.com/scroom/ha-govee-local-segments",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/scroom/ha-govee-local-segments/issues",
+  "requirements": [
+    "govee-local-api==3.1.0"
+  ],
+  "version": "2026.10.1.1"
+}
