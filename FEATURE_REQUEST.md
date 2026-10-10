@@ -7,6 +7,8 @@ Where to post:
 
 # Govee lights local: expose segment control (library support exists, PoC available)
 
+cc @Galorhallen (codeowner of `govee_light_local` and author of `govee-local-api`)
+
 ## Summary
 
 `govee-local-api` 3.1.0 (the library behind `govee_light_local`) already
@@ -62,3 +64,5 @@ commands were dropped with the 50 ms pause.
 
 If this direction is fine, I'm happy to turn the PoC into a PR (core and, if
 useful, the library).
+
+Related: https://github.com/orgs/home-assistant/discussions/2167 (scenes for H6076).
