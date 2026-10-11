@@ -1,5 +1,7 @@
 # Govee lights local – segment control (proof of concept)
 
+[![Open your Home Assistant instance and open this repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=scroom&repository=ha-govee-local-segments&category=integration)
+
 A fork of Home Assistant's built-in **Govee lights local** integration
 (`govee_light_local`, taken from HA 2026.10.1) that exposes the
 **segment control already implemented in the underlying library**
@@ -34,7 +36,8 @@ other models are welcome.
 
 Requires Home Assistant **2026.10** or newer.
 
-1. **HACS:** HACS → ⋮ → *Custom repositories* → add
+1. **HACS:** click the button above (opens HACS in your Home Assistant),
+   or HACS → ⋮ → *Custom repositories* → add
    `https://github.com/scroom/ha-govee-local-segments` (type *Integration*), then download it.
    **Manual:** copy `custom_components/govee_light_local` to `/config/custom_components/`.
 2. Restart Home Assistant. A warning that a custom integration overrides a
