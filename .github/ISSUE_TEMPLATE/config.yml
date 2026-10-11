@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Proposal for Home Assistant core (discussion #5120)
+    url: https://github.com/orgs/home-assistant/discussions/5120
+    about: Support the proposal to add segment control to the built-in integration

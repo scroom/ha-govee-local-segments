@@ -1,0 +1,30 @@
+name: Bug report
+description: Something does not work as described
+labels: ["bug"]
+body:
+  - type: input
+    id: model
+    attributes:
+      label: Model (SKU)
+      placeholder: H6076
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Home Assistant version / fork version
+      placeholder: 2026.10.0 / v2026.10.1.5
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Settings → System → Logs, filter "govee". Remove serial numbers, MAC and IP addresses.
+      render: text

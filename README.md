@@ -32,6 +32,14 @@ test suite passes unchanged against this fork.
 Segment counts come from `govee-local-api`'s capability table. Reports for
 other models are welcome.
 
+## Help wanted: device reports
+
+Does your Govee light work with this fork? Please
+[report your device](https://github.com/scroom/ha-govee-local-segments/issues/new?template=device_report.yml)
+– also if something does not work. These reports are the evidence needed to
+get segment support into Home Assistant itself
+([discussion #5120](https://github.com/orgs/home-assistant/discussions/5120)).
+
 ## Installation
 
 Requires Home Assistant **2026.10** or newer.
