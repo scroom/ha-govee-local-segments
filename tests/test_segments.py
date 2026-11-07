@@ -3,7 +3,10 @@
 import base64
 from unittest.mock import AsyncMock, call
 
-from govee_local_api.light_capabilities import BASIC_CAPABILITIES
+from govee_local_api.light_capabilities import (
+    BASIC_CAPABILITIES,
+    GOVEE_LIGHT_CAPABILITIES,
+)
 from govee_local_api.message import SegmentColorMessages
 import pytest
 from pytest_homeassistant_custom_component.common import mock_restore_cache
@@ -50,6 +53,81 @@ async def test_entities_created(hass: HomeAssistant, mock_govee_api) -> None:
     assert hass.states.get(SEG.format(8)) is None
     entry = er.async_get(hass).async_get(SEG.format(1))
     assert entry.unique_id == "AA:BB:CC:DD_segment_1"
+
+
+async def test_h705e_extended_entities(hass: HomeAssistant, mock_govee_api) -> None:
+    """Expose all 21 sections without changing existing unique IDs."""
+    await setup_light(
+        hass, mock_govee_api, GOVEE_LIGHT_CAPABILITIES["H705E"], sku="H705E"
+    )
+    registry = er.async_get(hass)
+    for section in range(1, 22):
+        entity_id = f"light.h705e_segment_{section}"
+        assert hass.states.get(entity_id) is not None
+        assert (
+            registry.async_get(entity_id).unique_id == f"AA:BB:CC:DD_segment_{section}"
+        )
+    assert hass.states.get("light.h705e_segment_22") is None
+
+
+async def test_h705e_extended_on_off(hass: HomeAssistant, mock_govee_api) -> None:
+    """Section 21 uses the captured mask and sends one checksum."""
+    _, device = await setup_light(
+        hass, mock_govee_api, GOVEE_LIGHT_CAPABILITIES["H705E"], sku="H705E"
+    )
+    await hass.services.async_call(
+        LIGHT_DOMAIN,
+        "turn_on",
+        {ATTR_ENTITY_ID: "light.h705e_segment_21", ATTR_RGB_COLOR: (255, 0, 0)},
+        blocking=True,
+    )
+    mock_govee_api.send_raw_command.assert_awaited_once_with(
+        device, "33051501ff0000000000000000001000000000cd"
+    )
+    mock_govee_api.set_segment_rgb_color.assert_not_awaited()
+    await hass.services.async_call(
+        LIGHT_DOMAIN,
+        "turn_off",
+        {ATTR_ENTITY_ID: "light.h705e_segment_21"},
+        blocking=True,
+    )
+    assert mock_govee_api.send_raw_command.call_args.args[1] == (
+        "3305150100000000000000000000100000000032"
+    )
+    assert hass.states.get("light.h705e_segment_21").state == STATE_OFF
+    assert hass.states.get("light.h705e").state == STATE_ON
+
+
+async def test_h705e_gradient_and_mirroring(
+    hass: HomeAssistant, mock_govee_api
+) -> None:
+    """Gradient dispatch and whole-light mirroring include extended sections."""
+    await setup_light(
+        hass, mock_govee_api, GOVEE_LIGHT_CAPABILITIES["H705E"], sku="H705E"
+    )
+    await hass.services.async_call(
+        DOMAIN,
+        "set_gradient",
+        {ATTR_ENTITY_ID: "light.h705e", "colors": ["#ff0000", "#0000ff"]},
+        blocking=True,
+    )
+    assert [s for s, _ in segment_calls(mock_govee_api)] == list(range(1, 16))
+    assert mock_govee_api.send_raw_command.await_count == 6
+    assert hass.states.get("light.h705e_segment_21").attributes[ATTR_RGB_COLOR] == (
+        0,
+        0,
+        255,
+    )
+    await hass.services.async_call(
+        LIGHT_DOMAIN,
+        "turn_on",
+        {ATTR_ENTITY_ID: "light.h705e", ATTR_RGB_COLOR: (10, 20, 30)},
+        blocking=True,
+    )
+    for section in range(1, 22):
+        assert hass.states.get(f"light.h705e_segment_{section}").attributes[
+            ATTR_RGB_COLOR
+        ] == (10, 20, 30)
 
 
 async def test_no_segments_for_basic_device(
