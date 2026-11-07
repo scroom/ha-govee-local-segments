@@ -28,8 +28,15 @@ test suite passes unchanged against this fork.
 | Model | Segments | Segment 1 | Tested |
 |---|---|---|---|
 | H6076 (RGBICWW floor lamp) | 7 | bottom | HA 2026.10.0, LAN only (internet blocked): single segments, brightness, segment off, gradients (2/3 stops, reverse, area target), sync with main light (RGB, color temp, scene, on/off), state restore after restart, all 12 music effects and music sensitivity |
+| H705E (Permanent Outdoor Lights 2) | 21 | first four bulbs | 84-bulb installation: existing local sections 1–7 and extended section 21 physically verified; section 21 changed only the final four bulbs over LAN. Extended section addressing is backed by 18 checksum-valid app BLE color commands for sections 16–21. |
 
-Segment counts come from `govee-local-api`'s capability table. Reports for
+Segment counts come from `govee-local-api`'s capability table, with a model-specific
+H705E override for 21 sections. Existing sections 1–15 use the original library
+path; sections 16–21 extend the little-endian mask in the same 20-byte frame
+and use the library's existing raw-command LAN transport. Hardware testing
+confirmed section 21; the other extended sections and gradients are covered by
+packet and integration tests, rather than separate physical confirmations.
+Reports for
 other models are welcome.
 
 ## Help wanted: device reports
