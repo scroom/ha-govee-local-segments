@@ -47,6 +47,7 @@ from .const import (
 )
 from .coordinator import GoveeLocalApiCoordinator, GoveeLocalConfigEntry
 from .gradient import RGB, interpolate, parse_colors, scale
+from .segments import segment_count, set_segment_rgb_color
 from .music import DEFAULT_SENSITIVITY, MUSIC_EFFECTS, music_packets, supports_music
 
 _LOGGER = logging.getLogger(__name__)
@@ -69,7 +70,7 @@ async def async_setup_entry(
         if capabilities and GoveeLightFeatures.SEGMENT_CONTROL & capabilities.features:
             entities.extend(
                 GoveeSegmentLight(coordinator, device, index)
-                for index in range(1, capabilities.segments_count + 1)
+                for index in range(1, segment_count(device) + 1)
             )
         return entities
 
@@ -291,7 +292,7 @@ class GoveeLight(CoordinatorEntity[GoveeLocalApiCoordinator], LightEntity):
     def _segments_count(self) -> int:
         capabilities = self._device.capabilities
         if capabilities and GoveeLightFeatures.SEGMENT_CONTROL & capabilities.features:
-            return capabilities.segments_count
+            return segment_count(self._device)
         return 0
 
     def _notify_segments(self, colors: list[RGB] | None) -> None:
@@ -343,7 +344,7 @@ class GoveeLight(CoordinatorEntity[GoveeLocalApiCoordinator], LightEntity):
         for index, rgb in enumerate(segment_colors, start=1):
             if index > 1:
                 await asyncio.sleep(SEGMENT_SEND_DELAY)
-            await self._device.set_segment_rgb_color(index, *rgb)
+            await set_segment_rgb_color(self._device, index, *rgb)
         if brightness_pct is not None:
             await self.coordinator.set_brightness(self._device, brightness_pct)
 
@@ -473,8 +474,8 @@ class GoveeSegmentLight(
 
         if not self._device.on:
             await self.coordinator.turn_on(self._device)
-        await self._device.set_segment_rgb_color(
-            self._index, *scale(self._base_rgb, self._seg_brightness)
+        await set_segment_rgb_color(
+            self._device, self._index, *scale(self._base_rgb, self._seg_brightness)
         )
         self._seg_on = True
         self.async_write_ha_state()
@@ -482,7 +483,7 @@ class GoveeSegmentLight(
     @override
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the segment dark (the lamp itself stays on)."""
-        await self._device.set_segment_rgb_color(self._index, 0, 0, 0)
+        await set_segment_rgb_color(self._device, self._index, 0, 0, 0)
         self._seg_on = False
         self.async_write_ha_state()
 
